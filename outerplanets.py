@@ -69,7 +69,10 @@ def initial_position(angle, distance):
     return distance * np.array([np.cos(x), np.sin(x)])
 
 def initial_velocity(angle, distance, period):
-    raise NotImplementedError
+    '''returns vector velocity_i '''
+    scalar_v = 2 * np.pi * distance / period
+    x = np.deg2rad(angle)
+    return scalar_v * np.array([-np.sin(x), np.cos(x)]) # because dr/dt
 
 def F_gravity(r, m, M):
     """Force due to gravity between two masses.
@@ -90,7 +93,7 @@ def F_gravity(r, m, M):
     rhat = r/np.sqrt(rr)
     # replace NotImplemented with the correct force
     # expression (Eq 2)
-    return NotImplemented
+    return -G_gravity * m * M / np.sqrt(rr) * rhat
 
 
 def omega(v, r):
@@ -155,12 +158,32 @@ def integrate_orbits(dt=0.1, t_max=320, coupled=True):
     r[0, 0, :] = initial_position(theta0['Uranus'], distance['Uranus'])
     r[0, 1, :] = initial_position(theta0['Neptune'], distance['Neptune'])
 
-    raise NotImplementedError
-    #v[0, 0, :] = ...
-    #v[0, 1, :] = ...
+    
+    v[0, 0, :] = initial_velocity(theta0['Uranus'], distance['Uranus'],
+                                  period['Uranus'])
+    v[0, 1, :] = initial_velocity(theta0['Neptune'], distance['Neptune'],
+                                  period['Neptune'])
 
-    # ...
-
+    F_SU = F_gravity(r[0,0,:], mass['Uranus'], mass['Sun'])
+    F_SN = F_gravity(r[0,1,:], mass['Neptune'], mass['Sun'])
+    F_UN = F_gravity(r[0,0,:]-r[0,1,:], mass['Uranus'], mass['Neptune'])
+    Ft = [F_SU, F_SN, F_UN]
+    
+    for i in range(nsteps-1):
+        #update next velocities contribution from current position
+        vhalf_U = v[i,0,:] + 0.5*dt*(Ft[0]-coupled*Ft[2])/mass['Uranus']
+        vhalf_N = v[i,1,:] + 0.5*dt*(Ft[1]+coupled*Ft[2])/mass['Neptune']
+        # update next position
+        r[i+1,0,:] = r[i,0,:] + dt*vhalf_U
+        r[i+1,1,:] = r[i,1,:] + dt*vhalf_N
+        # Force at next position
+        F_SU = F_gravity(r[i+1,0,:], mass['Uranus'], mass['Sun'])
+        F_SN = F_gravity(r[i+1,1,:], mass['Neptune'], mass['Sun'])
+        F_UN = F_gravity(r[i+1,0,:]-r[0,1,:], mass['Uranus'], mass['Neptune'])      
+        Ft = [F_SU, F_SN, F_UN]
+        # add in velocity contribution from next position
+        v[i+1,0,:] = vhalf_U + 0.5*dt*(Ft[0]-coupled*Ft[2])/mass['Uranus']
+        v[i+1,1,:] = vhalf_N + 0.5*dt*(Ft[1]+coupled*Ft[2])/mass['Neptune']
     return time, r, v
 
 if __name__ == "__main__":
@@ -191,7 +214,7 @@ if __name__ == "__main__":
     rN = r[:, 1]
     vU = v[:, 0]
     omegaU = omega(vU, rU)
-
+    '''
     #----------
     # IMPLEMENT
     #
@@ -199,7 +222,7 @@ if __name__ == "__main__":
     DeltaOmegaU = None
     #
     #---------
-
+    '''
     # plot orbits
     fig_orbits = "uranus_neptune_orbits.pdf"
     fig_anomaly = "uranus_anomaly.pdf"
@@ -213,7 +236,7 @@ if __name__ == "__main__":
     ax.set_ylabel(r"$y$ (AU)")
     ax.legend(loc="upper right")
     ax.set_title("Uranus and Neptune orbits")
-
+    '''
     ax = plt.subplot(1,2,2)
     ax.plot(time, DeltaOmegaU)
     ax.set_xlabel("years")
@@ -222,5 +245,5 @@ if __name__ == "__main__":
     ax.figure.tight_layout()
     ax.figure.savefig(fig_anomaly)
     print("Uranus anomaly plotted in {0}".format(fig_anomaly))
-
+    '''
 

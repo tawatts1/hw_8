@@ -214,15 +214,11 @@ if __name__ == "__main__":
     rN = r[:, 1]
     vU = v[:, 0]
     omegaU = omega(vU, rU)
-    '''
-    #----------
-    # IMPLEMENT
-    #
-    raise NotImplementedError
-    DeltaOmegaU = None
-    #
-    #---------
-    '''
+    
+    
+    DeltaOmegaU = omegaU - omegaU[0]
+    
+    
     # plot orbits
     fig_orbits = "uranus_neptune_orbits.pdf"
     fig_anomaly = "uranus_anomaly.pdf"
@@ -236,7 +232,7 @@ if __name__ == "__main__":
     ax.set_ylabel(r"$y$ (AU)")
     ax.legend(loc="upper right")
     ax.set_title("Uranus and Neptune orbits")
-    '''
+    # plot the anomaly of Uranuss
     ax = plt.subplot(1,2,2)
     ax.plot(time, DeltaOmegaU)
     ax.set_xlabel("years")
@@ -245,4 +241,4 @@ if __name__ == "__main__":
     ax.figure.tight_layout()
     ax.figure.savefig(fig_anomaly)
     print("Uranus anomaly plotted in {0}".format(fig_anomaly))
-    '''
+

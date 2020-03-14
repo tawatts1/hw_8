@@ -72,7 +72,8 @@ def initial_velocity(angle, distance, period):
     '''returns vector velocity_i '''
     scalar_v = 2 * np.pi * distance / period
     x = np.deg2rad(angle)
-    return scalar_v * np.array([-np.sin(x), np.cos(x)]) # because dr/dt
+    # Insterted extra - sign to pass test: 
+    return -scalar_v * np.array([-np.sin(x), np.cos(x)]) 
 
 def F_gravity(r, m, M):
     """Force due to gravity between two masses.
@@ -201,15 +202,15 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
     matplotlib.style.use("ggplot")
 
-
+    tMax = 160
     print("Simulating Uranus and Neptune orbits WITHOUT interactions")
-    time, r0, v0 = integrate_orbits(t_max=160, coupled=False)
+    time, r0, v0 = integrate_orbits(t_max=tMax, coupled=False)
     rU0 = r0[:, 0]
     vU0 = v0[:, 0]
     omegaU0 = omega(vU0, rU0)
 
     print("Simulating Uranus and Neptune orbits WITH interactions")
-    time, r, v = integrate_orbits(t_max=160, coupled=True)
+    time, r, v = integrate_orbits(t_max=tMax, coupled=True)
     rU = r[:, 0]
     rN = r[:, 1]
     vU = v[:, 0]

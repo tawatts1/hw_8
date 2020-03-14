@@ -37,7 +37,7 @@ theta0 = {'Uranus': 205.640,
 distance = {'Uranus': 19.1914,
             'Neptune': 30.0611,
 }
-# mass in AU
+# mass in Solar Masses
 mass = {'Sun': 1.,
         'Uranus': 4.366244e-5,
         'Neptune': 5.151389e-5,
@@ -93,7 +93,7 @@ def F_gravity(r, m, M):
     rhat = r/np.sqrt(rr)
     # replace NotImplemented with the correct force
     # expression (Eq 2)
-    return -G_gravity * m * M / np.sqrt(rr) * rhat
+    return -G_gravity * m * M / rr * rhat
 
 
 def omega(v, r):
@@ -158,7 +158,7 @@ def integrate_orbits(dt=0.1, t_max=320, coupled=True):
     r[0, 0, :] = initial_position(theta0['Uranus'], distance['Uranus'])
     r[0, 1, :] = initial_position(theta0['Neptune'], distance['Neptune'])
 
-    
+
     v[0, 0, :] = initial_velocity(theta0['Uranus'], distance['Uranus'],
                                   period['Uranus'])
     v[0, 1, :] = initial_velocity(theta0['Neptune'], distance['Neptune'],
@@ -168,7 +168,7 @@ def integrate_orbits(dt=0.1, t_max=320, coupled=True):
     F_SN = F_gravity(r[0,1,:], mass['Neptune'], mass['Sun'])
     F_UN = F_gravity(r[0,0,:]-r[0,1,:], mass['Uranus'], mass['Neptune'])
     Ft = [F_SU, F_SN, F_UN]
-    
+
     for i in range(nsteps-1):
         #update next velocities contribution from current position
         vhalf_U = v[i,0,:] + 0.5*dt*(Ft[0]-coupled*Ft[2])/mass['Uranus']
@@ -179,7 +179,7 @@ def integrate_orbits(dt=0.1, t_max=320, coupled=True):
         # Force at next position
         F_SU = F_gravity(r[i+1,0,:], mass['Uranus'], mass['Sun'])
         F_SN = F_gravity(r[i+1,1,:], mass['Neptune'], mass['Sun'])
-        F_UN = F_gravity(r[i+1,0,:]-r[0,1,:], mass['Uranus'], mass['Neptune'])      
+        F_UN = F_gravity(r[i+1,0,:]-r[0,1,:], mass['Uranus'], mass['Neptune'])
         Ft = [F_SU, F_SN, F_UN]
         # add in velocity contribution from next position
         v[i+1,0,:] = vhalf_U + 0.5*dt*(Ft[0]-coupled*Ft[2])/mass['Uranus']
@@ -246,4 +246,3 @@ if __name__ == "__main__":
     ax.figure.savefig(fig_anomaly)
     print("Uranus anomaly plotted in {0}".format(fig_anomaly))
     '''
-

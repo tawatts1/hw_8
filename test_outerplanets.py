@@ -30,7 +30,7 @@ def test_import_function():
 def test_DeltaOmega(t_max=160):
     time, r0, v0 = integrate_orbits(t_max=t_max, coupled=False)
     time, r, v = integrate_orbits(t_max=160, coupled=True)
-    DeltaOmegaU = omega(v0[:, 0], r0[:, 0]) - omega(v[:, 0], r[:, 0])
+    DeltaOmegaU = -omega(v0[:, 0], r0[:, 0]) + omega(v[:, 0], r[:, 0])
     result = [DeltaOmegaU.min(), DeltaOmegaU.max()]
     assert_array_almost_equal(result,
                               [-1.0492366485e-05, 7.84639028908e-05],

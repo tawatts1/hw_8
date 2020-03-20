@@ -169,22 +169,22 @@ def integrate_orbits(dt=0.1, t_max=320, coupled=True):
     F_SN = F_gravity(r[0,1,:], mass['Neptune'], mass['Sun'])
     F_UN = F_gravity(r[0,0,:]-r[0,1,:], mass['Uranus'], mass['Neptune'])
     Ft = [F_SU, F_SN, F_UN]
-
+    sign = 1*coupled
     for i in range(nsteps-1):
         #update next velocities contribution from current position
-        vhalf_U = v[i,0,:] + 0.5*dt*(Ft[0]-coupled*Ft[2])/mass['Uranus']
-        vhalf_N = v[i,1,:] + 0.5*dt*(Ft[1]+coupled*Ft[2])/mass['Neptune']
+        vhalf_U = v[i,0,:] + 0.5*dt*(Ft[0]-sign*Ft[2])/mass['Uranus']
+        vhalf_N = v[i,1,:] + 0.5*dt*(Ft[1]+sign*Ft[2])/mass['Neptune']
         # update next position
         r[i+1,0,:] = r[i,0,:] + dt*vhalf_U
         r[i+1,1,:] = r[i,1,:] + dt*vhalf_N
         # Force at next position
         F_SU = F_gravity(r[i+1,0,:], mass['Uranus'], mass['Sun'])
         F_SN = F_gravity(r[i+1,1,:], mass['Neptune'], mass['Sun'])
-        F_UN = F_gravity(r[i+1,0,:]-r[0,1,:], mass['Uranus'], mass['Neptune'])
+        F_UN = F_gravity(r[i+1,0,:]-r[i+1,1,:], mass['Uranus'], mass['Neptune'])
         Ft = [F_SU, F_SN, F_UN]
         # add in velocity contribution from next position
-        v[i+1,0,:] = vhalf_U + 0.5*dt*(Ft[0]-coupled*Ft[2])/mass['Uranus']
-        v[i+1,1,:] = vhalf_N + 0.5*dt*(Ft[1]+coupled*Ft[2])/mass['Neptune']
+        v[i+1,0,:] = vhalf_U + 0.5*dt*(Ft[0]-sign*Ft[2])/mass['Uranus']
+        v[i+1,1,:] = vhalf_N + 0.5*dt*(Ft[1]+sign*Ft[2])/mass['Neptune']
     return time, r, v
 
 if __name__ == "__main__":
@@ -217,8 +217,8 @@ if __name__ == "__main__":
     omegaU = omega(vU, rU)
     
     
-    DeltaOmegaU = omegaU - omegaU[0]
-    
+    DeltaOmegaU = omegaU - omegaU0
+    temp1 = [DeltaOmegaU.min(), DeltaOmegaU.max()] ###############3
     
     # plot orbits
     fig_orbits = "uranus_neptune_orbits.pdf"
